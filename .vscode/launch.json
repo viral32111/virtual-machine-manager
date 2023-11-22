@@ -1,0 +1,15 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "go",
+			"name": "Launch",
+			"preLaunchTask": "Build",
+			"request": "launch",
+			"mode": "exec",
+			"program": "${workspaceFolder}/builds/${workspaceFolderBasename}",
+			"args": [],
+			"internalConsoleOptions": "openOnSessionStart"
+		}
+	]
+}

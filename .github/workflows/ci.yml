@@ -1,0 +1,117 @@
+name: CI
+
+on:
+  push:
+    paths:
+      - 'source/**.go'
+      - 'go.mod'
+      - 'go.sum'
+      - '.github/workflows/*.yml'
+    branches:
+      - '**'
+    tags:
+     - '*.*.*'
+  workflow_dispatch:
+
+env:
+  PROJECT_NAME: virtual-machine-manager
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        os: [ 'linux', 'windows' ]
+        architecture: [ 'amd64', '386', 'arm64', 'arm' ]
+        library: [ '', 'glibc', 'musl' ]
+        exclude:
+          - os: windows
+            library: glibc
+          - os: windows
+            library: musl
+          - os: linux
+            library: ''
+    permissions:
+      contents: read
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+
+      - name: Install build tools
+        if: ${{ matrix.library == 'musl' }}
+        run: sudo apt-get install --no-install-recommends --yes musl-tools
+
+      - name: Create artifact & executable name
+        id: names
+        env:
+          PROJECT_NAME: ${{ env.PROJECT_NAME }}
+          OPERATING_SYSTEM: ${{ matrix.os }}
+          ARCHITECTURE: ${{ matrix.architecture }}
+          LIBRARY: ${{ matrix.library }}
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { PROJECT_NAME, OPERATING_SYSTEM, ARCHITECTURE, LIBRARY } = process.env;
+
+            const artifactName = [ PROJECT_NAME, OPERATING_SYSTEM, ARCHITECTURE, LIBRARY ]
+              .filter( value => value != '' )
+              .join( '-' );
+
+            const executableName = artifactName + ( OPERATING_SYSTEM == 'windows' ? '.exe' : '' );
+
+            core.setOutput( 'artifact', artifactName );
+            core.setOutput( 'executable', executableName );
+
+      - name: Build executable
+        env:
+          GOOS: ${{ matrix.os }}
+          GOARCH: ${{ matrix.architecture }}
+          CC: ${{ matrix.library == 'musl' && '/usr/bin/musl-gcc' || '' }}
+        run: go build -v -ldflags='-s -w' -o ${{ steps.names.outputs.executable }} ./source/
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ steps.names.outputs.artifact }}
+          path: ${{ steps.names.outputs.executable }}
+
+  release:
+    name: Release
+    runs-on: ubuntu-22.04
+    needs: build
+    if: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
+    permissions:
+      contents: write
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: artifacts
+
+      - name: Move executables
+        run: |
+          mv -v artifacts/${{ env.PROJECT_NAME }}-*/${{ env.PROJECT_NAME }}-* ./
+          rm -v -r artifacts
+
+      - name: Calculate checksums
+        run: |
+          md5sum ${{ env.PROJECT_NAME }}-* > MD5SUMS.txt
+          sha1sum ${{ env.PROJECT_NAME }}-* > SHA1SUMS.txt
+          sha256sum ${{ env.PROJECT_NAME }}-* > SHA256SUMS.txt
+          sha512sum ${{ env.PROJECT_NAME }}-* > SHA512SUMS.txt
+
+      - name: Create draft release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true
+          tag_name: ${{ github.ref_name }}
+          files: |
+            ${{ env.PROJECT_NAME }}-*
+            *SUMS.txt
+          token: ${{ secrets.GITHUB_TOKEN }}

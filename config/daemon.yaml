@@ -1,0 +1,51 @@
+directories:
+  data: /var/lib/vmm
+  logs: /var/log/vmm
+  runtime: /run/vmm
+
+logs:
+  enabled: true
+  file: daemon.log
+
+swtpm:
+  state: ${uuid}/state/tpm
+  log: ${uuid}/swtpm.log
+  pid: ${uuid}/swtpm.pid
+  socket: ${uuid}/swtpm.sock
+
+qemu:
+  state: ${uuid}/state/efi
+  log: ${uuid}/qemu.log
+  pid: ${uuid}/qemu.pid
+
+alerts: smtp
+
+smtp:
+  server:
+    address: mail.example.com
+    port: 465
+  tls: true
+  auth:
+    username: example
+    password: p4ssw0rd
+  from:
+    name: example
+    address: sender@example.com
+  to:
+    name: example
+    address: recipient@example.com
+  gnupg:
+    home: gnupg
+    sender: ABCDEFGHIJKLMNOP123
+    recipient: 123456789XYZCBA
+    passphrase: p4ssw0rd
+
+metrics:
+  enabled: true
+  listen:
+    address: 127.0.0.1
+    port: 8080
+  auth:
+    username: metrics
+    password: p4ssw0rd
+  path: /metrics
