@@ -1,13 +1,9 @@
 # Builds
-builds/
-*.exe*
+build/
+*.exe
 *.dll
 *.so
-*.dylib
+*.lib
 
-# Tests
-*.test
-*.out
-
-# Workspace
-go.work
+# Objects
+*.o
