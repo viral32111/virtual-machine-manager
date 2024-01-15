@@ -1,0 +1,24 @@
+name: virtual-machine-manager
+
+services:
+  development:
+    hostname: virtual-machine-manager
+    build:
+      dockerfile: Dockerfile
+    volumes:
+      # Visual Studio Code
+      - type: volume
+        source: vscode-server
+        target: /home/user/.vscode-server
+      - type: volume
+        source: vscode-server-insiders
+        target: /home/user/.vscode-server-insiders
+
+      # Repository
+      - type: bind
+        source: ../
+        target: /home/user/repository
+
+volumes:
+  vscode-server:
+  vscode-server-insiders:

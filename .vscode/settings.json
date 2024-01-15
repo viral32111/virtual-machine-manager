@@ -1,0 +1,18 @@
+{
+	// Project
+	"window.title": "Virtual Machine Manager",
+
+	// Always indent with tabs
+	"editor.detectIndentation": false,
+	"editor.insertSpaces": false,
+	"editor.indentSize": "tabSize",
+	"editor.tabSize": 4,
+
+	// We're in Docker
+	"workbench.colorCustomizations": {
+		"titleBar.activeBackground": "#095489",
+		"titleBar.activeForeground": "#ffffff",
+		"titleBar.inactiveBackground": "#095489",
+		"titleBar.inactiveForeground": "#ffffff",
+	}
+}

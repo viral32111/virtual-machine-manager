@@ -16,7 +16,11 @@ SYMLINK_NAME = vmm
 BUILD_DIR = build
 
 # Install directories
-PREFIX ?= $(HOME)/.local
+ifeq ( $(shell id -u), 0 )
+	PREFIX ?= /usr/local
+else
+	PREFIX ?= $(HOME)/.local
+endif
 BINDIR = $(PREFIX)/bin
 
 # Configuration-dependant variables

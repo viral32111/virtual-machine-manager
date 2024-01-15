@@ -1,0 +1,48 @@
+{
+	// Project
+	"name": "Virtual Machine Manager",
+
+	// Docker
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "development",
+	"workspaceFolder": "/home/user/repository",
+
+	// Clean-up on launch
+	"postAttachCommand": "make clean",
+
+	"mounts": [
+		// SSH
+		{ "type": "bind", "source": "${localEnv:HOME}/.ssh", "target": "/home/user/.ssh" },
+
+		// GnuPG
+		{ "type": "bind", "source": "${localEnv:HOME}/.gnupg", "target": "/home/user/.gnupg" },
+		{ "type": "bind", "source": "${localEnv:HOME}/.password-store", "target": "/home/user/.password-store" },
+
+		// Git
+		{ "type": "bind", "source": "${localEnv:HOME}/.gitconfig", "target": "/home/user/.gitconfig" }
+	],
+
+	// Visual Studio Code Extensions
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				// C/C++
+				"ms-vscode.cpptools",
+				"ms-vscode.cmake-tools",
+				"ms-vscode.makefile-tools",
+
+				// Docker
+				"ms-azuretools.vscode-docker",
+				"ms-vscode-remote.remote-containers",
+
+				// Quality-of-life
+				"VisualStudioExptTeam.vscodeintellicode",
+				"GitHub.copilot",
+		
+				// GitHub
+				"github.vscode-github-actions",
+				"GitHub.vscode-codeql"
+			]
+		}
+	}
+}
