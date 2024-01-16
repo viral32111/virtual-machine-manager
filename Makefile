@@ -15,7 +15,7 @@ BIN_NAME = vmm-$(VERSION)
 SYMLINK_NAME = vmm
 BUILD_DIR = build
 
-# Install directories
+# Install in /usr/local if root, otherwise $HOME/.local
 ifeq ( $(shell id -u), 0 )
 	PREFIX ?= /usr/local
 else
@@ -38,10 +38,12 @@ $(BUILD_DIR)/release/$(BIN_NAME) $(BUILD_DIR)/debug/$(BIN_NAME): $(SOURCE)
 	$(CC) $(CFLAGS) -o $@ $(SOURCE) $(LDFLAGS)
 	ln -s -f $(notdir $@) $(dir $@)$(SYMLINK_NAME)
 
+# Release configuration
 release: CFLAGS += $(CFLAGS_RELEASE)
 release: BUILD_DIR := $(BUILD_DIR)/release
 release: $(BUILD_DIR)/release/$(BIN_NAME)
 
+# Debug configuration
 debug: CFLAGS += $(CFLAGS_DEBUG)
 debug: BUILD_DIR := $(BUILD_DIR)/debug
 debug: $(BUILD_DIR)/debug/$(BIN_NAME)

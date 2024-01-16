@@ -18,9 +18,12 @@ jobs:
       contents: read
     strategy:
       matrix:
-        configuration:
-          - debug
-          - release
+        name: [ Debug, Release ]
+        include:
+          - name: Debug
+            configuration: debug
+          - name: Release
+            configuration: release
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
