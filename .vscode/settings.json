@@ -2,13 +2,13 @@
 	// Project
 	"window.title": "Virtual Machine Manager",
 
-	// Always indent with tabs
-	"editor.detectIndentation": false,
+	// Indent with tabs by default
+	"editor.detectIndentation": true,
 	"editor.insertSpaces": false,
 	"editor.indentSize": "tabSize",
 	"editor.tabSize": 4,
 
-	// We're in Docker
+	// This is a Docker dev environment project
 	"workbench.colorCustomizations": {
 		"titleBar.activeBackground": "#095489",
 		"titleBar.activeForeground": "#ffffff",
