@@ -1,0 +1,69 @@
+Virtual Machine Manager (v0.3.0)
+A utility for orchestrating QEMU virtual machines.
+
+Usage: /usr/local/vmm
+	-?, -h, --help, VMM_HELP=boolean
+		Show this help message & exit, defaults to false (off).
+
+	-v, --verbose, VMM_VERBOSE=boolean
+		Show additional output when running, defaults to false (off).
+
+	-q, --quiet, VMM_QUIET=boolean
+		Hide all output excluding errors when running, defaults to false (off).
+
+	-e, --extended, VMM_EXTENDED=boolean
+		Show additional columns for the list action, defaults to false (off).
+
+	-d, --drives, VMM_DRIVES=boolean
+		Include persistent data drives for the destroy and backup actions.
+
+	-n, --no-confirm, VMM_CONFIRM=boolean
+		Do not ask for confirmation before performing destructive actions (e.g., destroying a virtual machine), defaults to false (off).
+
+	-c, --config[=]<path>, VMM_CONFIG=path
+		Set the path to the global configuration file, defaults to '/etc/vmm/global.yaml'.
+
+	--example-config, VMM_EXAMPLE_CONFIG=boolean
+		Show an example configuration file & exit, defaults to false (off).
+
+	--version, VMM_VERSION=boolean
+		Show the version number of the program & exit, defaults to false (off).
+
+	[action], VMM_ACTION=string
+		The action to perform, defaults to 'list'. The possible actions are:
+			* list ~ Show the status of any/all virtual machine(s). See the -e/--extended flag.
+			* initialise ~ Create new virtual machine(s).
+			* create ~ Launch the specified virtual machine(s) without starting the guest operating system.
+			* start ~ Start the guest operating system on the specified virtual machine(s).
+			* shutdown ~ ACPI shutdown the guest operating system on the specified virtual machine(s).
+			* pause ~ Freeze the guest operating system on the specified virtual machine(s).
+			* resume ~ Unfreeze the guest operating system on the specified virtual machine(s).
+			* remove ~ Remove the specified virtual machine(s). This does NOT delete them.
+			* destroy ~ Delete the specified virtual machine(s). See the -d/--drives flag.
+			* backup ~ Backup the specified virtual machine(s). See the -d/--drives flag.
+
+	[machine,...], VMM_MACHINE=string,...
+		A comma-separated list of virtual machine names or UUIDs to perform the action on.
+		Defaults to '*' for the 'list' action to target all virtual machines. Required for all other actions.
+
+Examples:
+	vmm initialise demo
+		Initialises a new virtual machine with the name 'demo'.
+
+	vmm -c /etc/vmm.yaml --extended list
+		Sets a custom configuration file path and lists all virtual machines with additional columns.
+
+	vmm --verbose --no-confirm destroy demo
+		Deletes the virtual machine with the name 'demo' without asking for confirmation and shows additional output.
+
+Dependencies:
+	QEMU for running virtual machines & generating persistent drives. https://qemu.org
+	KVM for hardware acceleration. https://www.linux-kvm.org
+	SWTPM for emulating trusted platform modules. https://github.com/stefanberger/swtpm
+	EDK2 OVMF for enabling UEFI-compatible systems. https://github.com/tianocore/tianocore.github.io/wiki/OVMF
+	OpenSSL for generating crytographic secrets. https://openssl.org
+
+Made with ❤️ by viral32111 (contact@viral32111.com; https://viral32111.com).
+
+Proudly open-source under the GNU Affero General Public License v3.0.
+https://github.com/viral32111/virtual-machine-manager
