@@ -1,0 +1,118 @@
+# The user & group will be created if they do not exist.
+permissions:
+  user:
+    id: 1000
+    name: vmm
+  group:
+    id: 1000
+    name: vmm
+  umask: 077 # Only readable by the owner above.
+
+# Logs are always written to stdout regardless of the configuration below.
+logs:
+  file: global.log # Set to null to disable global logging to file.
+  directory: /var/log/vmm # Prepended to global & per-machine log file paths.
+  machines: machines/$u.log # Format for per-machine log file paths. e.g., machines/00000000-0000-0000-0000-000000000000.log
+  timestamp: '[%d-%m-%Y %H:%M:%S %z]' # Format for the date & time prefix in log entries.
+  rotation:
+    max: 9 # Retain up to 10 log files. Set to 0 to disable log rotation.
+    size: 10240 # Keep log files below 10 MiB.
+
+# Configuration files
+configs:
+  directory: /etc/vmm/configs # Prepended to global & per-machine configuration file paths.
+  machines: machines/$u.yaml # Format for per-machine configuration file paths. e.g., machines/00000000-0000-0000-0000-000000000000.yaml
+
+# Persistent & temporary data directories
+data:
+  # Virtual machine configuration files, drives, etc.
+  persistent:
+    directory: /var/lib/vmm # Prepended to global & per-machine persistent data paths.
+    machines: machines/$u # Format for per-machine persistent data directory paths. e.g., machines/00000000-0000-0000-0000-000000000000/*
+
+  # Runtime state, unix sockets, etc.
+  temporary:
+    directory: /run/vmm # Prepended to global & per-machine temporary paths.
+    machines: machines/$u # Format for per-machine temporary directory paths. e.g., machines/00000000-0000-0000-0000-000000000000/*
+
+# Default virtual machine configuration, can be overwritten within per-machine configuration files.
+defaults:
+  # TPM emulator
+  swtpm:
+    state: machines/$u/tpm
+    log: machines/$u/swtpm.log
+    pid: machines/$u/swtpm.pid
+
+    sockets:
+      control: machines/$u/swtpm.control.sock
+
+    key:
+      file: machines/$u/swtpm.key # Null to disable encryption.
+      algorithm: aes
+      bits: 256
+
+    # QEMU
+    qemu:
+      state: machines/$u/qemu
+      log: machines/$u/qemu.log
+      pid: machines/$u/qemu.pid
+
+      sockets:
+        monitor: machines/$u/qemu.monitor.sock
+        agent: machines/$u/qemu.agent.sock
+
+      timestamps:
+        start: machines/$u/start.timestamp
+        stop: machines/$u/stop.timestamp
+        pause: machines/$u/pause.timestamp
+
+# Paths to EDKII OVMF (UEFI) firmware. Usually installed via the package manager.
+ovmf:
+  bios: /usr/share/edk2/x64/OVMF.fd
+  code: /usr/share/edk2/x64/OVMF_CODE.fd
+  vars: /usr/share/edk2/x64/OVMF_VARS.fd
+
+# Notifications are always logged regardless of the configuration below.
+notifications:
+  via: smtp # Set to null to disable sending notifications.
+  events:
+    - start # Idle virtual machine has started.
+    - stop # Running virtual machine has stopped.
+    - pause # Running vrtual machine has paused.
+    - resume # Paused virtual machine has resumed.
+    - reset # Virtual machine has reset.
+    - create # New virtual machine created.
+    - delete # Existing virtual machine deleted.
+
+# Email is used for sending notifications.
+smtp:
+  server:
+    address: mail.example.com
+    port: 465
+    tls: true
+  authentication:
+    method: PLAIN
+    credentials:
+      username: server@example.com
+      password: P4ssw0rd!
+  from:
+    name: Example Server
+    address: server@example.com
+  to:
+    name: Me
+    address: myself@example.com
+  pgp:
+    home: /var/lib/vmm/gnupg
+    sender: ABCDEFGHIJKLMNOP
+    recipient: PONMLKJIHGFEDCBA
+    passphrase: P4ssw0rd!
+
+# Prometheus metrics for monitoring virtual machines. All columns in the list action are exported as metrics.
+metrics:
+  path: /metrics # The HTTP path.
+  listen: # Set to null to disable metrics.
+    address: 127.0.0.1
+    port: 8080
+  authentication: # Uses HTTP basic authentication.
+    username: prometheus
+    password: P4ssw0rd!
