@@ -77,5 +77,5 @@ RUN mkdir --verbose --parents ${USER_HOME}/.vscode-server ${USER_HOME}/.vscode-s
 VOLUME ${USER_HOME}/.vscode-server
 VOLUME ${USER_HOME}/.vscode-server-insiders
 
-# Sleep forever so container never exits
+# Sleep forever so container never exits - https://containers.dev/guide/dockerfile#docker-compose-image
 CMD [ "sleep", "infinity" ]

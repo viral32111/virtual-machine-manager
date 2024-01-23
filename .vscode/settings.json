@@ -6,13 +6,5 @@
 	"editor.detectIndentation": true,
 	"editor.insertSpaces": false,
 	"editor.indentSize": "tabSize",
-	"editor.tabSize": 4,
-
-	// This is a Docker dev environment project
-	"workbench.colorCustomizations": {
-		"titleBar.activeBackground": "#095489",
-		"titleBar.activeForeground": "#ffffff",
-		"titleBar.inactiveBackground": "#095489",
-		"titleBar.inactiveForeground": "#ffffff",
-	}
+	"editor.tabSize": 4
 }

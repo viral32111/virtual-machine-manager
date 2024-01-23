@@ -8,7 +8,7 @@
 	"workspaceFolder": "/home/user/repository",
 
 	// Clean-up on launch
-	"postAttachCommand": "make clean",
+	//"postAttachCommand": "make clean",
 
 	"mounts": [
 		// SSH
@@ -42,7 +42,16 @@
 				// GitHub
 				"github.vscode-github-actions",
 				"GitHub.vscode-codeql"
-			]
+			],
+			"settings": {
+				// We're in a Docker container
+				"workbench.colorCustomizations": {
+					"titleBar.activeBackground": "#095489",
+					"titleBar.activeForeground": "#ffffff",
+					"titleBar.inactiveBackground": "#095489",
+					"titleBar.inactiveForeground": "#ffffff"
+				}
+			}
 		}
 	}
 }

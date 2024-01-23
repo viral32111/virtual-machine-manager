@@ -1,9 +1,11 @@
 name: virtual-machine-manager
+version: '3'
 
 services:
   development:
     hostname: virtual-machine-manager
     build:
+      pull: true
       dockerfile: Dockerfile
     volumes:
       # Visual Studio Code
