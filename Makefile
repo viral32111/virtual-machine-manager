@@ -16,7 +16,7 @@ SYMLINK_NAME = vmm
 BUILD_DIR = build
 
 # Install in /usr/local if root, otherwise $HOME/.local
-ifeq ( $(shell id -u), 0 )
+ifeq ($(shell id -u), 0)
 	PREFIX ?= /usr/local
 else
 	PREFIX ?= $(HOME)/.local
@@ -24,8 +24,8 @@ endif
 BINDIR = $(PREFIX)/bin
 
 # Configuration-dependant variables
-CFLAGS_DEBUG = -Wall -Wextra -Wundef -Wformat-security -g
-CFLAGS_RELEASE = -Wall -Wextra -Werror -Wundef -Wformat-security -O2
+CFLAGS_DEBUG = -nodefaultlibs -lc -Wall -Wextra -Wundef -Wformat-security -g
+CFLAGS_RELEASE = -nodefaultlibs -lc -Wall -Wextra -Werror -Wundef -Wformat-security -O2
 
 .PHONY: all clean install uninstall run debug release
 
@@ -41,7 +41,11 @@ $(BUILD_DIR)/release/$(BIN_NAME) $(BUILD_DIR)/debug/$(BIN_NAME): $(SOURCE)
 # Release configuration
 release: CFLAGS += $(CFLAGS_RELEASE)
 release: BUILD_DIR := $(BUILD_DIR)/release
-release: $(BUILD_DIR)/release/$(BIN_NAME)
+release: strip
+
+# Remove symbols & debug information
+strip: $(BUILD_DIR)/release/$(BIN_NAME)
+	strip $<
 
 # Debug configuration
 debug: CFLAGS += $(CFLAGS_DEBUG)
@@ -50,7 +54,7 @@ debug: $(BUILD_DIR)/debug/$(BIN_NAME)
 
 # Launch the debug binary
 run:
-	$(BUILD_DIR)/debug/$(SYMLINK_NAME)
+	$(BUILD_DIR)/debug/$(BIN_NAME) $(ARGS)
 
 # Install the release binary (does not build)
 install:
