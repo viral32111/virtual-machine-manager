@@ -60,8 +60,9 @@ Dependencies:
 	QEMU for running virtual machines & generating persistent drives. https://qemu.org
 	KVM for hardware acceleration. https://www.linux-kvm.org
 	SWTPM for emulating trusted platform modules. https://github.com/stefanberger/swtpm
-	EDK2 OVMF for enabling UEFI-compatible systems. https://github.com/tianocore/tianocore.github.io/wiki/OVMF
+	EDK II OVMF for enabling UEFI-compatible systems. https://github.com/tianocore/tianocore.github.io/wiki/OVMF
 	OpenSSL for generating crytographic secrets. https://openssl.org
+	GnuPG for PGP email encryption & signing. https://gnupg.org
 
 Made with ❤️ by viral32111 (contact@viral32111.com; https://viral32111.com).
 

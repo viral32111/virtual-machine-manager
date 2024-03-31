@@ -6,5 +6,12 @@
 	"editor.detectIndentation": true,
 	"editor.insertSpaces": false,
 	"editor.indentSize": "tabSize",
-	"editor.tabSize": 4
+	"editor.tabSize": 4,
+	"files.associations": {
+		"unistd.h": "c",
+		"stdlib.h": "c",
+		"stdbool.h": "c",
+		"stdio.h": "c",
+		"getopt.h": "c"
+	}
 }
