@@ -140,7 +140,7 @@ void help(char* executable_path) {
 		printf("\tKVM for hardware acceleration (https://linux-kvm.org).\n");
 		printf("\tSWTPM for emulating trusted platform modules (https://github.com/stefanberger/swtpm).\n");
 		printf("\tEDK II OVMF for enabling UEFI-compatible systems (https://github.com/tianocore/tianocore.github.io/wiki/OVMF).\n");
-		printf("\tOpenSSL for generating crytographic secrets (https://openssl.org).\n");
+		printf("\tOpenSSL for generating cryptographic secrets (https://openssl.org).\n");
 		printf("\tGnuPG for PGP email encryption & signing (https://gnupg.org).\n\n");
 
 	printf("Crafted with \u2764\uFE0F  by viral32111 (contact@viral32111.com; https://viral32111.com).\n");

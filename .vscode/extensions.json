@@ -1,20 +1,15 @@
 {
 	"recommendations": [
-		// C/C++
-		"ms-vscode.cpptools",
-		"ms-vscode.cmake-tools",
-		"ms-vscode.makefile-tools",
-
-		// Docker
-		"ms-azuretools.vscode-docker",
-		"ms-vscode-remote.remote-containers",
-
-		// Quality-of-life
-		"VisualStudioExptTeam.vscodeintellicode",
-		"GitHub.copilot",
-
-		// GitHub
-		"github.vscode-github-actions",
-		"GitHub.vscode-codeql"
+		"redhat.vscode-yaml", // YAML
+		"ms-vscode.cpptools", // C/C++
+		"ms-vscode.cmake-tools", // CMake
+		"ms-vscode.makefile-tools", // Makefile
+		"ms-azuretools.vscode-docker", // Docker
+		"ms-vscode-remote.remote-containers", // Dev Containers
+		"VisualStudioExptTeam.vscodeintellicode", // IntelliSense
+		"streetsidesoftware.code-spell-checker", // Spell Checker
+		"GitHub.copilot", // Copilot
+		"github.vscode-github-actions", // GitHub Actions
+		"GitHub.vscode-codeql" // GitHub CodeQL
 	]
 }

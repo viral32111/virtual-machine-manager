@@ -69,4 +69,4 @@ uninstall:
 
 # Clean-up
 clean:
-	rm -r $(BUILD_DIR)
+	rm -r -f $(BUILD_DIR)

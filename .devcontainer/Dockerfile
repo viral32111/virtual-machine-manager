@@ -1,25 +1,49 @@
 # syntax=docker/dockerfile:1
 
+# docker container run --interactive --tty --pull always --entrypoint bash --rm ghcr.io/viral32111/virtual-machine-manager-development-environment:latest
+# docker buildx build --no-cache --pull --file .devcontainer/Dockerfile --tag ghcr.io/viral32111/virtual-machine-manager-development-environment:latest /var/empty
+
+# devcontainer build --no-cache --workspace-folder $PWD
+
 # Start from GCC
-FROM gcc:13.2.0-bookworm
+FROM gcc:14-bookworm
+
+# Default configuration
+ARG USER_ID=1000 \
+	USER_NAME=user
 
 # Execute instructions with Bash
 SHELL [ "bash", "-c" ]
 
-# Setup timezones & locales
+# Install SSL/TLS support for HTTPs package mirrors
+RUN apt-get update && \
+	apt-get install --no-install-recommends --yes apt-transport-https ca-certificates && \
+	apt-get clean --yes && \
+	rm --verbose --recursive /var/lib/apt/lists/*
+
+# Switch to a United Kingdom repository mirror for faster downloads
+# NOTE: This is only for x86_64 (amd64), as many mirrors do not serve aarch64 (arm64) packages!
+RUN if [[ "${TARGETARCH}" == 'amd64' ]]; then \
+		source /etc/os-release && \
+		echo "deb https://mirrorservice.org/sites/ftp.debian.org/debian/ ${VERSION_CODENAME} main contrib non-free" | tee /etc/apt/sources.list; \
+	fi
+
+# Install locales & internationalisation support
+ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
 	printf '%s\n' \
 		'tzdata tzdata/Areas select Europe' \
 		'tzdata tzdata/Zones/Europe select London' | debconf-set-selections --verbose && \
-	DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --yes tzdata locales && \
-	apt-get clean --yes && \
-	rm --verbose --recursive /var/lib/apt/lists/* && \
+	apt-get install --no-install-recommends --yes locales tzdata && \
 	printf '%s\n' \
 		'C.UTF-8 UTF-8' \
 		'en_GB.UTF-8 UTF-8' \
 		'en_US.UTF-8 UTF-8' | tee /etc/locale.gen && \
-	locale-gen
+	locale-gen && \
+	apt-get clean --yes && \
+	rm --verbose --recursive /var/lib/apt/lists/*
 
+# Set the locale - https://www.man7.org/linux/man-pages/man7/locale.7.html
 ENV CHARSET=UTF-8 \
 	LANG=en_GB.UTF-8 \
 	LANGUAGE=en_GB \
@@ -33,19 +57,22 @@ ENV CHARSET=UTF-8 \
 	LC_TIME=en_GB.UTF-8 \
 	TZ=Europe/London
 
-# Setup a regular user
-ENV USER_ID=1000 \
-	USER_NAME=user \
-	USER_HOME=/home/user \
+# Configure the regular user
+ENV USER_ID=${USER_ID} \
+	USER_NAME=${USER_NAME} \
+	USER_HOME=/home/${USER_NAME} \
+	PATH=/home/${USER_NAME}/.local/bin:$PATH \
 	HISTFILE=/dev/null \
 	EDITOR=/usr/bin/nano \
 	PAGER=/usr/bin/less
-RUN mkdir --verbose --parents ${USER_HOME} && \
+
+# Create the regular user
+RUN mkdir --verbose --parents ${USER_HOME}/.local/bin && \
 	groupadd --gid ${USER_ID} ${USER_NAME} && \
 	useradd --home ${USER_HOME} --shell /bin/bash --comment ${USER_NAME} --uid ${USER_ID} --gid ${USER_ID} ${USER_NAME} && \
 	chown --changes --recursive ${USER_ID}:${USER_ID} ${USER_HOME}
 
-# Setup super-user privileges
+# Setup privilege escalation
 RUN apt-get update && \
 	apt-get install --no-install-recommends --yes sudo && \
 	apt-get clean --yes && \
@@ -59,14 +86,27 @@ RUN apt-get update && \
 # Install common utilities
 RUN apt-get update && \
 	apt-get install --no-install-recommends --yes \
-		ca-certificates openssl \
 		curl wget \
-		nano && \
+		nano \
+		gnupg openssl && \
 	apt-get clean --yes && \
 	rm --verbose --recursive /var/lib/apt/lists/*
 
-# Switch to the regular user
-USER ${USER_ID}:${USER_ID}
+# Install virtualisation tools
+RUN apt-get update && \
+	apt-get install --no-install-recommends --yes \
+		qemu-system-x86 qemu-user qemu-utils \
+		swtpm swtpm-tools \
+		ovmf && \
+	apt-get clean --yes && \
+	rm --verbose --recursive /var/lib/apt/lists/*
+
+# Create the read-only empty directory
+RUN mkdir --verbose --parents /var/empty && \
+	chmod --changes 555 /var/empty
+
+# Switch to the regular user's home directory
+# NOTE: Cannot switch to the regular user as Dev Container requires root for updating the UID & GID to match the host's user
 WORKDIR ${USER_HOME}
 
 # Colourful prompt - cannot be an ENV instruction as /etc/bash/bashrc overwrites it!
@@ -77,5 +117,5 @@ RUN mkdir --verbose --parents ${USER_HOME}/.vscode-server ${USER_HOME}/.vscode-s
 VOLUME ${USER_HOME}/.vscode-server
 VOLUME ${USER_HOME}/.vscode-server-insiders
 
-# Sleep forever so container never exits - https://containers.dev/guide/dockerfile#docker-compose-image
+# Sleep forever so the container never exits - https://containers.dev/guide/dockerfile#docker-compose-image
 CMD [ "sleep", "infinity" ]

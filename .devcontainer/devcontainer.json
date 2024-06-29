@@ -1,14 +1,31 @@
 {
-	// Project
+	// Title
 	"name": "Virtual Machine Manager",
 
 	// Docker
+	"init": true,
 	"dockerComposeFile": "docker-compose.yml",
+
+	// See services in .devcontainer/docker-compose.yml
 	"service": "development",
+	"shutdownAction": "stopCompose",
+	"runServices": [],
+
+	// See repository volume in .devcontainer/docker-compose.yml
 	"workspaceFolder": "/home/user/repository",
 
-	// Clean-up on launch
-	//"postAttachCommand": "make clean",
+	// Not everyone is 1000:1000
+	"remoteUser": "user",
+	"updateRemoteUserUID": true,
+
+	// Clean launches
+	"postAttachCommand": "make clean",
+
+	// Forward VNC server
+	"forwardPorts": [ 5900 ],
+	"portsAttributes": {
+		"5900": { "label": "VNC", "onAutoForward": "silent", "requireLocalPort": true }
+	},
 
 	"mounts": [
 		// SSH
@@ -19,32 +36,16 @@
 		{ "type": "bind", "source": "${localEnv:HOME}/.password-store", "target": "/home/user/.password-store" },
 
 		// Git
-		{ "type": "bind", "source": "${localEnv:HOME}/.gitconfig", "target": "/home/user/.gitconfig" }
+		{ "type": "bind", "source": "${localEnv:HOME}/.gitconfig", "target": "/home/user/.gitconfig" },
+
+		// Docker
+		{ "type": "bind", "source": "${localEnv:HOME}/.docker", "target": "/home/user/.dokcer" }
 	],
 
-	// Visual Studio Code Extensions
+	// Blue title bar to indicate that we're in a Docker container
 	"customizations": {
 		"vscode": {
-			"extensions": [
-				// C/C++
-				"ms-vscode.cpptools",
-				"ms-vscode.cmake-tools",
-				"ms-vscode.makefile-tools",
-
-				// Docker
-				"ms-azuretools.vscode-docker",
-				"ms-vscode-remote.remote-containers",
-
-				// Quality-of-life
-				"VisualStudioExptTeam.vscodeintellicode",
-				"GitHub.copilot",
-		
-				// GitHub
-				"github.vscode-github-actions",
-				"GitHub.vscode-codeql"
-			],
 			"settings": {
-				// We're in a Docker container
 				"workbench.colorCustomizations": {
 					"titleBar.activeBackground": "#095489",
 					"titleBar.activeForeground": "#ffffff",

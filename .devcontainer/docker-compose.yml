@@ -1,12 +1,23 @@
 name: virtual-machine-manager
-version: '3'
 
 services:
   development:
-    hostname: virtual-machine-manager
+    hostname: virtual-machine-manager.local
+    image: ghcr.io/viral32111/virtual-machine-manager-development-environment:latest
+    pull_policy: always
     build:
       pull: true
       dockerfile: Dockerfile
+    networks:
+      - internal
+    ports:
+      # VNC
+      - target: 5900
+        published: 5900
+        host_ip: 127.0.0.1
+        protocol: tcp
+    extra_hosts:
+      - host.docker.internal:host-gateway # Access to services on host
     volumes:
       # Visual Studio Code
       - type: volume
@@ -24,3 +35,7 @@ services:
 volumes:
   vscode-server:
   vscode-server-insiders:
+
+networks:
+  internal:
+    driver: bridge
