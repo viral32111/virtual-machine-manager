@@ -55,6 +55,9 @@ jobs:
             org.opencontainers.image.vendor=${{ github.repository_owner }}
             com.docker.extension.publisher-url=https://viral32111.com
 
+      - name: Create empty context directory
+        run: mkdir --verbose --parents /var/empty
+
       - name: Build & push Docker image
         uses: docker/build-push-action@v5
         with:
