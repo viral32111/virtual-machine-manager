@@ -70,7 +70,7 @@ jobs:
 
       - name: Delete stale Docker images
         if: ${{ github.event_name != 'pull_request' && !startsWith( github.ref_name, 'dependabot/' ) }}
-        uses: actions/delete-package-versions@v4
+        uses: actions/delete-package-versions@v5
         with:
           package-type: container
           package-name: virtual-machine-manager-development-environment
