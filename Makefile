@@ -24,49 +24,83 @@ endif
 BINDIR = $(PREFIX)/bin
 
 # Configuration-dependant variables
-CFLAGS_DEBUG = -nodefaultlibs -lc -Wall -Wextra -Wundef -Wformat-security -g
+CFLAGS_DEBUG = -nodefaultlibs -lc -Wall -Wextra -Wundef -Wformat-security -g -DDEBUG
 CFLAGS_RELEASE = -nodefaultlibs -lc -Wall -Wextra -Werror -Wundef -Wformat-security -O2
 
-.PHONY: all clean install uninstall run debug release
+# Targets
+.PHONY: all clean install uninstall run debug release watch strip dump
 
 # Default to release
 all: release
 
 # Build the target
 $(BUILD_DIR)/release/$(BIN_NAME) $(BUILD_DIR)/debug/$(BIN_NAME): $(SOURCE)
-	mkdir -p $(dir $@)
+	mkdir -v -p $(dir $@)
 	$(CC) $(CFLAGS) -o $@ $(SOURCE) $(LDFLAGS)
-	ln -s -f $(notdir $@) $(dir $@)$(SYMLINK_NAME)
+	ln -v -s -f $(notdir $@) $(dir $@)$(SYMLINK_NAME)
+	@echo
 
 # Release configuration
 release: CFLAGS += $(CFLAGS_RELEASE)
 release: BUILD_DIR := $(BUILD_DIR)/release
 release: strip
+release: BIN_PATH := $(BUILD_DIR)/$(BIN_NAME)
+release: dump
 
 # Remove symbols & debug information
 strip: $(BUILD_DIR)/release/$(BIN_NAME)
 	strip $<
+	@echo
 
 # Debug configuration
 debug: CFLAGS += $(CFLAGS_DEBUG)
 debug: BUILD_DIR := $(BUILD_DIR)/debug
 debug: $(BUILD_DIR)/debug/$(BIN_NAME)
+debug: BIN_PATH := $(BUILD_DIR)/$(BIN_NAME)
+debug: dump
+
+# Print information about the binary
+dump: $(BIN_PATH)
+	ldd $(BIN_PATH)
+	du -h $(BIN_PATH)
+	stat $(BIN_PATH)
+	file $(BIN_PATH)
+	md5sum $(BIN_PATH)
+	sha1sum $(BIN_PATH)
+	sha256sum $(BIN_PATH)
+	sha512sum $(BIN_PATH)
+	@echo
+
+# Watch for changes in the source directory
+watch:
+	@while inotifywait -r -e modify,create,delete,move source/; do \
+		make clean; \
+		make debug; \
+		make run; \
+	done
 
 # Launch the debug binary
 run:
-	$(BUILD_DIR)/debug/$(BIN_NAME) $(ARGS)
+	$(BUILD_DIR)/debug/$(BIN_NAME) $(filter-out $@,$(MAKECMDGOALS)) $(ARGS)
 
 # Install the release binary (does not build)
 install:
-	mkdir -p $(DESTDIR)$(BINDIR)
+	mkdir -v -p $(DESTDIR)$(BINDIR)
 	install -m 755 $(BUILD_DIR)/release/$(BIN_NAME) $(DESTDIR)$(BINDIR)
-	ln -s -f $(DESTDIR)$(BINDIR)/$(BIN_NAME) $(DESTDIR)$(BINDIR)/$(SYMLINK_NAME)
+	ln -v -s -f $(DESTDIR)$(BINDIR)/$(BIN_NAME) $(DESTDIR)$(BINDIR)/$(SYMLINK_NAME)
+	@echo
 
 # Uninstall the release binary
 uninstall:
-	rm -f $(DESTDIR)$(BINDIR)/$(BIN_NAME)
-	rm -f $(DESTDIR)$(BINDIR)/$(SYMLINK_NAME)
+	rm -v -f $(DESTDIR)$(BINDIR)/$(BIN_NAME)
+	rm -v -f $(DESTDIR)$(BINDIR)/$(SYMLINK_NAME)
+	@echo
 
 # Clean-up
 clean:
-	rm -r -f $(BUILD_DIR)
+	rm -v -r -f $(BUILD_DIR)
+	@echo
+
+# Prevent interpreting arguments destined for run as targets
+%:
+	@:
