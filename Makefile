@@ -1,6 +1,6 @@
 # Metadata
 VMM_MAJOR_VERSION = 0
-VMM_MINOR_VERSION = 3
+VMM_MINOR_VERSION = 0
 VMM_PATCH_VERSION = 0
 
 # Compiler & linker options
