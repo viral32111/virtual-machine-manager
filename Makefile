@@ -45,7 +45,7 @@ release: CFLAGS += $(CFLAGS_RELEASE)
 release: BUILD_DIR := $(BUILD_DIR)/release
 release: strip
 release: BIN_PATH := $(BUILD_DIR)/$(BIN_NAME)
-release: dump
+# release: dump
 
 # Remove symbols & debug information
 strip: $(BUILD_DIR)/release/$(BIN_NAME)
@@ -57,7 +57,7 @@ debug: CFLAGS += $(CFLAGS_DEBUG)
 debug: BUILD_DIR := $(BUILD_DIR)/debug
 debug: $(BUILD_DIR)/debug/$(BIN_NAME)
 debug: BIN_PATH := $(BUILD_DIR)/$(BIN_NAME)
-debug: dump
+# debug: dump
 
 # Print information about the binary
 dump: $(BIN_PATH)
